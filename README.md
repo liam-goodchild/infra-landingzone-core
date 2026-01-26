@@ -176,22 +176,6 @@ This repository uses GitHub Flow with the following branch prefixes:
 - Azure CLI authenticated with appropriate permissions
 - Azure DevOps service connection configured
 
-### Local Development
-
-```bash
-# Navigate to infrastructure directory
-cd infra
-
-# Initialise Terraform
-terraform init -backend-config=vars/uks/backend.tfvars
-
-# Plan changes
-terraform plan -var-file=vars/globals.tfvars -var-file=vars/uks/prd.tfvars
-
-# Apply changes (use CI/CD for production)
-terraform apply -var-file=vars/globals.tfvars -var-file=vars/uks/prd.tfvars
-```
-
 ### External Resources
 
 - [Azure Landing Zones Library](https://azure.github.io/Azure-Landing-Zones-Library/)
