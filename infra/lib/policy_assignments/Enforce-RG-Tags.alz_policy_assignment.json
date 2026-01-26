@@ -1,0 +1,11 @@
+{
+  "name": "Enforce-RG-Tags",
+  "type": "Microsoft.Authorization/policyAssignments",
+  "properties": {
+    "displayName": "Enforce Resource Group Tags",
+    "description": "Enforce required tags on Resource Groups",
+    "policyDefinitionId": "/providers/Microsoft.Management/managementGroups/placeholder/providers/Microsoft.Authorization/policyDefinitions/Enforce-RG-Tags",
+    "enforcementMode": "Default",
+    "parameters": {}
+  }
+}

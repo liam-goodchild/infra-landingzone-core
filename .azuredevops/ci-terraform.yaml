@@ -31,8 +31,8 @@ parameters:
 
 variables:
   # Container, Service Connection & tfvars
-  backendContainerName: PLACEHOLDER
-  serviceConnectionName: PLACEHOLDER
+  backendContainerName: infra-landingzone-core
+  serviceConnectionName: sh-sc-core
   globalTfvars: infra/vars/globals.tfvars
   tfvars: infra/vars/uks/$(environmentCode).tfvars
   # State Management

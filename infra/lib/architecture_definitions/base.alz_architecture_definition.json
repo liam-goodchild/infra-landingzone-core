@@ -1,0 +1,65 @@
+{
+  "name": "base",
+  "management_groups": [
+    {
+      "id": "sky-haven",
+      "display_name": "Sky Haven",
+      "parent_id": null,
+      "exists": false
+    },
+    {
+      "id": "platform",
+      "display_name": "Platform",
+      "parent_id": "sky-haven",
+      "exists": false
+    },
+    {
+      "id": "landing-zones",
+      "display_name": "Landing Zones",
+      "parent_id": "sky-haven",
+      "exists": false
+    },
+    {
+      "id": "decommissioned",
+      "display_name": "Decommissioned",
+      "parent_id": "sky-haven",
+      "exists": false
+    },
+    {
+      "id": "sandbox",
+      "display_name": "Sandbox",
+      "parent_id": "sky-haven",
+      "exists": false
+    },
+    {
+      "id": "connectivity",
+      "display_name": "Connectivity",
+      "parent_id": "platform",
+      "exists": false
+    },
+    {
+      "id": "identity",
+      "display_name": "Identity",
+      "parent_id": "platform",
+      "exists": false
+    },
+    {
+      "id": "management",
+      "display_name": "Management",
+      "parent_id": "platform",
+      "exists": false
+    },
+    {
+      "id": "security",
+      "display_name": "Security",
+      "parent_id": "platform",
+      "exists": false
+    },
+    {
+      "id": "shared",
+      "display_name": "Shared",
+      "parent_id": "platform",
+      "exists": false
+    }
+  ]
+}

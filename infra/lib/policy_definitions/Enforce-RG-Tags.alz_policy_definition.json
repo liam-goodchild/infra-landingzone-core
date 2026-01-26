@@ -1,0 +1,69 @@
+{
+  "name": "Enforce-RG-Tags",
+  "type": "Microsoft.Authorization/policyDefinitions",
+  "properties": {
+    "policyType": "Custom",
+    "mode": "All",
+    "displayName": "Enforce Resource Group Tags",
+    "description": "Enforce Tags on Resource Groups based on CAF tagging standards",
+    "metadata": {
+      "version": "2.0.0",
+      "category": "Tags"
+    },
+    "parameters": {},
+    "policyRule": {
+      "if": {
+        "allOf": [
+          {
+            "field": "type",
+            "equals": "Microsoft.Resources/subscriptions/resourceGroups"
+          },
+          {
+            "anyof": [
+              {
+                "field": "[concat('tags[', 'Environment', ']')]",
+                "notIn": [
+                  "Dev",
+                  "Test",
+                  "UAT",
+                  "Staging",
+                  "PreProd",
+                  "Prod",
+                  "PoC",
+                  "Sandbox"
+                ]
+              },
+              {
+                "field": "[concat('tags[', 'Criticality', ']')]",
+                "notIn": ["Low", "Medium", "High", "Mission-Critical"]
+              },
+              {
+                "field": "[concat('tags[', 'BusinessUnit', ']')]",
+                "exists": false
+              },
+              {
+                "field": "[concat('tags[', 'Owner', ']')]",
+                "exists": false
+              },
+              {
+                "field": "[concat('tags[', 'CostCenter', ']')]",
+                "exists": false
+              },
+              {
+                "field": "[concat('tags[', 'Application', ']')]",
+                "exists": false
+              },
+              {
+                "field": "[concat('tags[', 'OpsTeam', ']')]",
+                "exists": false
+              }
+            ]
+          }
+        ]
+      },
+      "then": {
+        "effect": "deny"
+      }
+    }
+  }
+}

@@ -1,0 +1,7 @@
+{
+  "name": "custom_alz",
+  "policy_assignments": ["Enforce-RG-Tags", "Enforce-R-Tags"],
+  "policy_definitions": ["Enforce-RG-Tags", "Enforce-R-Tags"],
+  "policy_set_definitions": [],
+  "role_definitions": []
+}
