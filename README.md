@@ -33,12 +33,12 @@ sky-haven (Root)
 
 ### Key Components
 
-| Component | Description |
-|-----------|-------------|
-| Management Groups | CAF-aligned hierarchy for policy inheritance and access control |
-| Azure Policies | Custom and built-in policies for governance enforcement |
-| RBAC Groups | Azure AD groups with subscription-scoped role assignments |
-| Subscriptions | Programmatic subscription creation and management group placement |
+| Component         | Description                                                       |
+| ----------------- | ----------------------------------------------------------------- |
+| Management Groups | CAF-aligned hierarchy for policy inheritance and access control   |
+| Azure Policies    | Custom and built-in policies for governance enforcement           |
+| RBAC Groups       | Azure AD groups with subscription-scoped role assignments         |
+| Subscriptions     | Programmatic subscription creation and management group placement |
 
 ---
 
@@ -74,15 +74,15 @@ infra-landingzone-core/
 └── README.md
 ```
 
-For detailed information on ALZ library customisation, see [infra/lib/README.md](infra/lib/README.md).
+For detailed information on ALZ library customisation, see [infra/lib/readme.md](infra/lib/README.md).
 
 ---
 
 ## Environments
 
-| Environment | Region | Description |
-|-------------|--------|-------------|
-| `prd` | UK South | Production deployment |
+| Environment | Region   | Description           |
+| ----------- | -------- | --------------------- |
+| `prd`       | UK South | Production deployment |
 
 ---
 
@@ -92,30 +92,31 @@ For detailed information on ALZ library customisation, see [infra/lib/README.md]
 
 The `deploy_caf_policies` variable controls policy deployment:
 
-| Value | Behaviour |
-|-------|-----------|
-| `false` | Deploys management group hierarchy only |
-| `true` | Deploys full CAF policy framework with governance enforcement |
+| Value   | Behaviour                                                     |
+| ------- | ------------------------------------------------------------- |
+| `false` | Deploys management group hierarchy only                       |
+| `true`  | Deploys full CAF policy framework with governance enforcement |
 
 ### Required Tags
 
 When CAF policies are enabled, the following tags are enforced across all resources:
 
-| Tag | Description | Example Values |
-|-----|-------------|----------------|
-| `Environment` | Deployment environment | Dev, Test, UAT, Staging, PreProd, Prod, PoC, Sandbox |
-| `Criticality` | Business criticality | Low, Medium, High, Mission-Critical |
-| `BusinessUnit` | Owning business unit | Any value |
-| `Owner` | Resource owner | Email address |
-| `CostCenter` | Cost allocation code | Any value |
-| `Application` | Application name | Any value |
-| `OpsTeam` | Operations team | Any value |
+| Tag            | Description            | Example Values                                       |
+| -------------- | ---------------------- | ---------------------------------------------------- |
+| `Environment`  | Deployment environment | Dev, Test, UAT, Staging, PreProd, Prod, PoC, Sandbox |
+| `Criticality`  | Business criticality   | Low, Medium, High, Mission-Critical                  |
+| `BusinessUnit` | Owning business unit   | Any value                                            |
+| `Owner`        | Resource owner         | Email address                                        |
+| `CostCenter`   | Cost allocation code   | Any value                                            |
+| `Application`  | Application name       | Any value                                            |
+| `OpsTeam`      | Operations team        | Any value                                            |
 
 ### RBAC Configuration
 
 Azure AD groups are created with the following pattern: `{prefix}_{group_name}`
 
 Default groups provisioned:
+
 - **Owner**: Full administrative access
 - **Contributor**: Resource modification access
 - **Reader**: Read-only access
@@ -124,24 +125,24 @@ Default groups provisioned:
 
 ## Pipelines
 
-| Pipeline | File | Trigger | Description |
-|----------|------|---------|-------------|
-| CI | [ci-terraform.yaml](.azuredevops/ci-terraform.yaml) | Pull request to `main` | Linting, documentation, terraform plan |
-| CD | [cd-terraform.yaml](.azuredevops/cd-terraform.yaml) | Merge to `main` | Plan, apply, and optional versioning |
-| Destroy | [destroy-terraform.yaml](.azuredevops/destroy-terraform.yaml) | Manual | Controlled resource destruction |
-| Dev | [dev-terraform.yaml](.azuredevops/dev-terraform.yaml) | Manual | Development testing and validation |
+| Pipeline | File                                                          | Trigger                | Description                            |
+| -------- | ------------------------------------------------------------- | ---------------------- | -------------------------------------- |
+| CI       | [ci-terraform.yaml](.azuredevops/ci-terraform.yaml)           | Pull request to `main` | Linting, documentation, terraform plan |
+| CD       | [cd-terraform.yaml](.azuredevops/cd-terraform.yaml)           | Merge to `main`        | Plan, apply, and optional versioning   |
+| Destroy  | [destroy-terraform.yaml](.azuredevops/destroy-terraform.yaml) | Manual                 | Controlled resource destruction        |
+| Dev      | [dev-terraform.yaml](.azuredevops/dev-terraform.yaml)         | Manual                 | Development testing and validation     |
 
 ### CI Pipeline Stages
 
 1. **Linting**: Prettier formatting and Checkov security scanning
-2. **Documentation**: Auto-generates terraform-docs into README
+2. **Documentation**: Auto-generates terraform-docs into readme
 3. **Plan**: Creates and publishes terraform plan artifact
 
 ### CD Pipeline Stages
 
 1. **Plan**: Validates changes against current state
 2. **Apply**: Deploys validated changes to Azure
-3. **Versioning**: Creates semantic version git tags (optional)
+3. **Versioning**: Creates semantic version Git tags (optional)
 
 ---
 
@@ -151,11 +152,11 @@ Default groups provisioned:
 
 This repository uses GitHub Flow with the following branch prefixes:
 
-| Prefix | Purpose |
-|--------|---------|
+| Prefix       | Purpose          |
+| ------------ | ---------------- |
 | `feature/**` | New capabilities |
-| `patch/**` | Bug fixes |
-| `major/**` | Breaking changes |
+| `patch/**`   | Bugfixes         |
+| `major/**`   | Breaking changes |
 
 ### Deployment Process
 

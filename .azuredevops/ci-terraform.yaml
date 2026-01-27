@@ -6,7 +6,7 @@ pr:
       - main
   paths:
     exclude:
-      - '**/README.md'
+      - "**/README.md"
 
 resources:
   repositories:
@@ -27,7 +27,7 @@ parameters:
   - name: additionalTfVars
     displayName: Additional Terraform Variables
     type: string
-    default: ' '
+    default: " "
 
 variables:
   # Container, Service Connection & tfvars
@@ -48,10 +48,10 @@ variables:
 stages:
   # Stage 1: Linting
   - stage: Linting
-    displayName: 'Linting & Validation'
+    displayName: "Linting & Validation"
     jobs:
       - job: SuperLinter
-        displayName: 'Super-Linter'
+        displayName: "Super-Linter"
         steps:
           - template: validation/linting.yaml@templates
             parameters:
@@ -60,12 +60,12 @@ stages:
 
   # Stage 2: Documentation
   - stage: Documentation
-    displayName: 'Terraform Documentation'
+    displayName: "Terraform Documentation"
     dependsOn: Linting
     condition: succeeded()
     jobs:
       - job: TerraformDocs
-        displayName: 'Generate Terraform Docs'
+        displayName: "Generate Terraform Docs"
         steps:
           - template: documentation/tf-documentation.yaml@templates
             parameters:
@@ -74,12 +74,12 @@ stages:
 
   # Stage 3: Terraform Plan
   - stage: Plan
-    displayName: 'Terraform Plan'
+    displayName: "Terraform Plan"
     dependsOn: Documentation
     condition: succeeded()
     jobs:
       - job: TerraformPlan
-        displayName: 'Terraform Plan'
+        displayName: "Terraform Plan"
         steps:
           - checkout: self
           - template: terraform/terraform-cicd.yaml@templates
@@ -95,4 +95,3 @@ stages:
               additionalCommandOptions: ${{ parameters.additionalTfVars }}
               publishPlan: false
               ensureBackendContainer: true
-              

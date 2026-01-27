@@ -25,7 +25,7 @@ parameters:
   - name: additionalTfVars
     displayName: Additional Terraform Variables
     type: string
-    default: ' '
+    default: " "
 
 variables:
   # Container, Service Connection & tfvars
@@ -45,10 +45,10 @@ variables:
 
 stages:
   - stage: Terraform
-    displayName: 'Terraform ${{ parameters.terraformAction }}'
+    displayName: "Terraform ${{ parameters.terraformAction }}"
     jobs:
       - job: TerraformAction
-        displayName: 'Terraform ${{ parameters.terraformAction }}'
+        displayName: "Terraform ${{ parameters.terraformAction }}"
         steps:
           - checkout: self
           - template: terraform/terraform-dev.yaml@templates
@@ -62,4 +62,3 @@ stages:
               envTfvars: $(tfvars)
               globalTfvars: $(globalTfvars)
               additionalCommandOptions: ${{ parameters.additionalTfVars }}
-              

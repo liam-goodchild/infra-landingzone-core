@@ -4,7 +4,7 @@ trigger:
       - main
   paths:
     exclude:
-      - '**/README.md'
+      - "**/README.md"
 
 pr: none
 
@@ -27,7 +27,7 @@ parameters:
   - name: additionalTfVars
     displayName: Additional Terraform Variables
     type: string
-    default: ' '
+    default: " "
   - name: enableVersioning
     displayName: Enable Git Versioning
     type: boolean
@@ -52,10 +52,10 @@ variables:
 stages:
   # Stage 1: Terraform Plan
   - stage: Plan
-    displayName: 'Terraform Plan'
+    displayName: "Terraform Plan"
     jobs:
       - job: TerraformPlan
-        displayName: 'Terraform Plan'
+        displayName: "Terraform Plan"
         steps:
           - checkout: self
           - template: terraform/terraform-cicd.yaml@templates
@@ -70,17 +70,17 @@ stages:
               globalTfvars: $(globalTfvars)
               additionalCommandOptions: ${{ parameters.additionalTfVars }}
               publishPlan: true
-              planArtifactName: 'tfplan-${{ parameters.environment }}'
+              planArtifactName: "tfplan-${{ parameters.environment }}"
               ensureBackendContainer: true
 
   # Stage 2: Terraform Apply
   - stage: Apply
-    displayName: 'Terraform Apply'
+    displayName: "Terraform Apply"
     dependsOn: Plan
     condition: succeeded()
     jobs:
       - job: TerraformApply
-        displayName: 'Terraform Apply'
+        displayName: "Terraform Apply"
         steps:
           - checkout: self
           - template: terraform/terraform-cicd.yaml@templates
@@ -98,15 +98,14 @@ stages:
 
   # Stage 3: Git Versioning
   - stage: Versioning
-    displayName: 'Git Versioning'
+    displayName: "Git Versioning"
     dependsOn: Apply
     condition: and(succeeded(), eq('${{ parameters.enableVersioning }}', 'true'))
     jobs:
       - job: GitVersioning
-        displayName: 'Create Git Tag'
+        displayName: "Create Git Tag"
         steps:
           - template: versioning/git-versioning.yaml@templates
             parameters:
               defaultAction: patch
               defaultBranch: main
-              

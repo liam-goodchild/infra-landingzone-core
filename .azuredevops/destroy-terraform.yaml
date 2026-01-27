@@ -20,11 +20,11 @@ parameters:
   - name: confirmDestroy
     displayName: 'Type "DESTROY" to confirm'
     type: string
-    default: ''
+    default: ""
   - name: additionalTfVars
     displayName: Additional Terraform Variables
     type: string
-    default: ' '
+    default: " "
 
 variables:
   # Container, Service Connection & tfvars
@@ -44,10 +44,10 @@ variables:
 
 stages:
   - stage: Validation
-    displayName: 'Validate Destroy Request'
+    displayName: "Validate Destroy Request"
     jobs:
       - job: ValidateConfirmation
-        displayName: 'Validate Confirmation'
+        displayName: "Validate Confirmation"
         steps:
           - pwsh: |
               if ("${{ parameters.confirmDestroy }}" -ne "DESTROY") {
@@ -56,15 +56,15 @@ stages:
                 exit 1
               }
               Write-Host "##[section]Destroy confirmation validated."
-            displayName: 'Check Confirmation'
+            displayName: "Check Confirmation"
 
   - stage: Destroy
-    displayName: 'Terraform Destroy'
+    displayName: "Terraform Destroy"
     dependsOn: Validation
     condition: succeeded()
     jobs:
       - job: TerraformDestroy
-        displayName: 'Terraform Destroy - ${{ parameters.environment }}'
+        displayName: "Terraform Destroy - ${{ parameters.environment }}"
         steps:
           - checkout: self
           - template: terraform/terraform-cicd.yaml@templates
@@ -79,4 +79,3 @@ stages:
               globalTfvars: $(globalTfvars)
               additionalCommandOptions: ${{ parameters.additionalTfVars }}
               ensureBackendContainer: false
-              
