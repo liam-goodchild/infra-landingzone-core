@@ -1,0 +1,84 @@
+{
+  "name": "Enforce-R-Tags",
+  "type": "Microsoft.Authorization/policyDefinitions",
+  "properties": {
+    "policyType": "Custom",
+    "mode": "All",
+    "displayName": "Enforce Resource Tags",
+    "description": "Enforce Tags on Resources based on CAF tagging standards",
+    "metadata": {
+      "version": "2.0.2",
+      "category": "Tags"
+    },
+    "parameters": {},
+    "policyRule": {
+      "if": {
+        "allOf": [
+          {
+            "field": "type",
+            "notIn": [
+              "Microsoft.Network/privateDnsZones/virtualNetworkLinks",
+              "Microsoft.Resources/subscriptions/resourceGroups",
+              "Microsoft.Authorization/roleAssignments",
+              "Microsoft.Authorization/policyAssignments",
+              "Microsoft.Authorization/locks",
+              "Microsoft.Resources/deployments",
+              "Microsoft.Insights/actionGroups",
+              "Microsoft.Insights/metricAlerts",
+              "Microsoft.Insights/scheduledQueryRules",
+              "Microsoft.Insights/activityLogAlerts",
+              "Microsoft.Insights/diagnosticSettings",
+              "Microsoft.Insights/dataCollectionRules",
+              "Microsoft.Insights/dataCollectionRuleAssociations",
+              "Microsoft.AlertsManagement/actionRules"
+            ]
+          },
+          {
+            "anyOf": [
+              {
+                "field": "[concat('tags[', 'Environment', ']')]",
+                "notIn": [
+                  "Dev",
+                  "Test",
+                  "UAT",
+                  "Staging",
+                  "PreProd",
+                  "Prod",
+                  "PoC",
+                  "Sandbox"
+                ]
+              },
+              {
+                "field": "[concat('tags[', 'Criticality', ']')]",
+                "notIn": ["Low", "Medium", "High", "Mission-Critical"]
+              },
+              {
+                "field": "[concat('tags[', 'BusinessUnit', ']')]",
+                "exists": false
+              },
+              {
+                "field": "[concat('tags[', 'Owner', ']')]",
+                "exists": false
+              },
+              {
+                "field": "[concat('tags[', 'CostCenter', ']')]",
+                "exists": false
+              },
+              {
+                "field": "[concat('tags[', 'Application', ']')]",
+                "exists": false
+              },
+              {
+                "field": "[concat('tags[', 'OpsTeam', ']')]",
+                "exists": false
+              }
+            ]
+          }
+        ]
+      },
+      "then": {
+        "effect": "deny"
+      }
+    }
+  }
+}

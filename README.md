@@ -1,137 +1,245 @@
-# Repository Setup Standards
+# Azure Landing Zone Core Infrastructure
 
-This document defines the standard for setting up a new repository from this template.
+This repository contains the Terraform configuration and CI/CD pipelines to deploy the core components of the Microsoft Cloud Adoption Framework (CAF) Platform in Azure, including management group hierarchies, subscription management, governance policies, and RBAC configuration.
 
-The primary objective is to ensure all repositories maintain consistent configuration, security settings, and documentation from the outset.
+## Purpose
 
-- Ensures security features are enabled from day one
-- Maintains consistent branch protection across all repositories
-- Provides a repeatable, standardised setup process
-- Reduces configuration drift between projects
-- Enables automated documentation generation
+This repository provides a standardised, enterprise-grade foundation for Azure landing zone deployments using Infrastructure as Code principles.
 
----
-
-## 1. Set Default Branch
-
-In GitHub, set the default branch to:
-
-- `main`
+- **Governance at Scale**: Deploys a CAF-aligned management group hierarchy with consistent policy enforcement across all subscriptions
+- **Compliance Automation**: Enforces organisational standards through Azure Policy, including mandatory resource tagging
+- **Identity Management**: Provisions Azure AD groups and role assignments as code for consistent access control
+- **Repeatable Deployments**: Leverages Azure Verified Modules (AVM) for reliable, tested infrastructure patterns
+- **Integrated CI/CD**: Provides automated validation, planning, and deployment through Azure DevOps pipelines
 
 ---
 
-## 2. Enable Security Settings
+## Architecture Overview
 
-Enable the following security features on the repository:
+This solution deploys a hierarchical management group structure following Microsoft's Cloud Adoption Framework best practices:
 
-- Security advisories
-- Dependabot
-- Code scanning
-- Secret scanning
-
----
-
-## 3. Import Branch Ruleset
-
-Import the following JSON as a **branch ruleset**:
-
-```json
-{
-  "id": 12143210,
-  "name": "main-branch-protection",
-  "target": "branch",
-  "source_type": "Repository",
-  "source": "liam-goodchild/docs-engineering-standards",
-  "enforcement": "active",
-  "conditions": {
-    "ref_name": {
-      "exclude": [],
-      "include": [
-        "~DEFAULT_BRANCH"
-      ]
-    }
-  },
-  "rules": [
-    {
-      "type": "deletion"
-    },
-    {
-      "type": "non_fast_forward"
-    },
-    {
-      "type": "pull_request",
-      "parameters": {
-        "required_approving_review_count": 0,
-        "dismiss_stale_reviews_on_push": false,
-        "required_reviewers": [],
-        "require_code_owner_review": false,
-        "require_last_push_approval": false,
-        "required_review_thread_resolution": false,
-        "allowed_merge_methods": [
-          "merge",
-          "squash",
-          "rebase"
-        ]
-      }
-    }
-  ],
-  "bypass_actors": []
-}
+```
+sky-haven (Root)
+├── platform/
+│   ├── connectivity          # Network resources
+│   ├── identity              # Identity management
+│   ├── management            # Operational management
+│   ├── security              # Security controls
+│   └── shared                # Shared platform resources
+├── landing-zones             # Workload subscriptions
+├── decommissioned            # Retired resources
+└── sandbox                   # Non-production testing
 ```
 
+### Key Components
+
+| Component         | Description                                                       |
+| ----------------- | ----------------------------------------------------------------- |
+| Management Groups | CAF-aligned hierarchy for policy inheritance and access control   |
+| Azure Policies    | Custom and built-in policies for governance enforcement           |
+| RBAC Groups       | Azure AD groups with subscription-scoped role assignments         |
+| Subscriptions     | Programmatic subscription creation and management group placement |
+
 ---
 
-## 4. Rename Repository
+## Repository Structure
 
-Rename the repository using the following AI prompt:
-
-```text
-The repository will contain [description].
-Suggest a repository name following the naming convention at:
-https://raw.githubusercontent.com/liam-goodchild/docs-engineering-standards/main/repo-standards/repo-naming/README.md
+```
+infra-landingzone-core/
+├── .azuredevops/                    # CI/CD pipeline definitions
+│   ├── ci-terraform.yaml            # Pull request validation
+│   ├── cd-terraform.yaml            # Production deployment
+│   ├── destroy-terraform.yaml       # Resource destruction
+│   ├── dev-terraform.yaml           # Development testing
+│   └── linters/                     # Code quality configuration
+├── infra/                           # Terraform configuration
+│   ├── _providers.tf                # Provider configuration
+│   ├── _terraform.tf                # Version and backend setup
+│   ├── _variables.tf                # Input variable definitions
+│   ├── _locals.tf                   # Local value calculations
+│   ├── _data.tf                     # Data source references
+│   ├── _tags.tf                     # Common tagging standards
+│   ├── management-groups.tf         # ALZ module invocation
+│   ├── rbac.tf                      # Identity and access control
+│   ├── subscriptions.tf             # Subscription lifecycle
+│   ├── lib/                         # ALZ library customisations
+│   │   ├── policy_definitions/      # Custom policy definitions
+│   │   ├── policy_assignments/      # Policy-to-scope mappings
+│   │   ├── archetype_definitions/   # Reusable policy bundles
+│   │   └── architecture_definitions/# Management group templates
+│   └── vars/                        # Variable files
+│       ├── globals.tfvars           # Global settings
+│       └── uks/                     # Regional configuration
+│           └── prd.tfvars           # Production variables
+└── README.md
 ```
 
----
-
-## 5. Create CI/CD Pipelines, Service Principals and Service Connections
-
-Create the CI/CD pipelines in the relevant folder within Azure DevOps, ensuring that the CD pipeline has pull request validation manually disabled before opening a PR. Create the necessary service principals and service connections and ensure appropriate RBAC is granted.
+For detailed information on ALZ library customisation, see [infra/lib/readme.md](infra/lib/README.md).
 
 ---
 
-## 6. Update Pipeline Placeholders
+## Environments
 
-Update placeholder container and service connection names in the various pipelines with the generated values.
-
----
-
-## 7. Generate README
-
-Once the code in the repository is in a working state, generate a README using the following AI prompt:
-
-```text
-The repository is for [description of your project].
-Generate a README for my new repository following the template at:
-https://raw.githubusercontent.com/liam-goodchild/docs-engineering-standards/main/readme-standards/README.md
-```
+| Environment | Region   | Description           |
+| ----------- | -------- | --------------------- |
+| `prd`       | UK South | Production deployment |
 
 ---
 
-## 8. Add Terraform Documentation Block
+## Configuration
 
-Add the following block into the README for automated Terraform documentation:
+### Policy Deployment
 
-```text
-<!-- prettier-ignore-start -->
-<!-- textlint-disable -->
-<!-- BEGIN_TF_DOCS -->
-<!-- END_TF_DOCS -->
-<!-- textlint-enable -->
-<!-- prettier-ignore-end -->
-```
+The `deploy_caf_policies` variable controls policy deployment:
+
+| Value   | Behaviour                                                     |
+| ------- | ------------------------------------------------------------- |
+| `false` | Deploys management group hierarchy only                       |
+| `true`  | Deploys full CAF policy framework with governance enforcement |
+
+### Required Tags
+
+When CAF policies are enabled, the following tags are enforced across all resources:
+
+| Tag            | Description            | Example Values                                       |
+| -------------- | ---------------------- | ---------------------------------------------------- |
+| `Environment`  | Deployment environment | Dev, Test, UAT, Staging, PreProd, Prod, PoC, Sandbox |
+| `Criticality`  | Business criticality   | Low, Medium, High, Mission-Critical                  |
+| `BusinessUnit` | Owning business unit   | Any value                                            |
+| `Owner`        | Resource owner         | Email address                                        |
+| `CostCenter`   | Cost allocation code   | Any value                                            |
+| `Application`  | Application name       | Any value                                            |
+| `OpsTeam`      | Operations team        | Any value                                            |
+
+### RBAC Configuration
+
+Azure AD groups are created with the following pattern: `{prefix}_{group_name}`
+
+Default groups provisioned:
+
+- **Owner**: Full administrative access
+- **Contributor**: Resource modification access
+- **Reader**: Read-only access
+
+---
+
+## Pipelines
+
+| Pipeline | File                                                          | Trigger                | Description                            |
+| -------- | ------------------------------------------------------------- | ---------------------- | -------------------------------------- |
+| CI       | [ci-terraform.yaml](.azuredevops/ci-terraform.yaml)           | Pull request to `main` | Linting, documentation, terraform plan |
+| CD       | [cd-terraform.yaml](.azuredevops/cd-terraform.yaml)           | Merge to `main`        | Plan, apply, and optional versioning   |
+| Destroy  | [destroy-terraform.yaml](.azuredevops/destroy-terraform.yaml) | Manual                 | Controlled resource destruction        |
+| Dev      | [dev-terraform.yaml](.azuredevops/dev-terraform.yaml)         | Manual                 | Development testing and validation     |
+
+### CI Pipeline Stages
+
+1. **Linting**: Prettier formatting and Checkov security scanning
+2. **Documentation**: Auto-generates terraform-docs into readme
+3. **Plan**: Creates and publishes terraform plan artifact
+
+### CD Pipeline Stages
+
+1. **Plan**: Validates changes against current state
+2. **Apply**: Deploys validated changes to Azure
+3. **Versioning**: Creates semantic version Git tags (optional)
+
+---
+
+## Development Workflow
+
+> **Important**: This workflow must be followed exactly. Skipping steps can lead to broken environments, state corruption, or unsafe infrastructure changes.
+
+This repository uses GitHub Flow with the following branch prefixes:
+
+| Prefix       | Purpose          |
+| ------------ | ---------------- |
+| `feature/**` | New capabilities |
+| `patch/**`   | Bugfixes         |
+| `major/**`   | Breaking changes |
+
+### Deployment Process
+
+1. Create a branch from latest `main` using the appropriate prefix
+2. Commit changes and open a Pull Request
+3. CI pipeline automatically validates changes
+4. Iterate until CI passes and team approves
+5. Merge to `main` triggers CD pipeline
+6. Changes are automatically deployed to production
+
+---
+
+## Quick Reference
+
+### Prerequisites
+
+- Terraform >= 1.0, < 2.0
+- Azure CLI authenticated with appropriate permissions
+- Azure DevOps service connection configured
+
+### External Resources
+
+- [Azure Landing Zones Library](https://azure.github.io/Azure-Landing-Zones-Library/)
+- [AVM ALZ Module](https://registry.terraform.io/modules/Azure/avm-ptn-alz/azurerm/latest)
+- [Microsoft Cloud Adoption Framework](https://learn.microsoft.com/azure/cloud-adoption-framework/)
 
 ---
 
 ## Summary
 
-Following these steps ensures your repository is properly configured with security features, branch protection, CI/CD pipelines, and documentation standards from the start.
+This repository provides a complete, policy-driven Azure landing zone foundation using Infrastructure as Code, enabling consistent governance, identity management, and subscription lifecycle control across the organisation.
+
+---
+
+<!-- prettier-ignore-start -->
+<!-- textlint-disable -->
+<!-- BEGIN_TF_DOCS -->
+## Requirements
+
+| Name | Version |
+|------|---------|
+| <a name="requirement_terraform"></a> [terraform](#requirement\_terraform) | >= 1.0, < 2.0 |
+| <a name="requirement_alz"></a> [alz](#requirement\_alz) | >= 0.17, < 1.0 |
+| <a name="requirement_azapi"></a> [azapi](#requirement\_azapi) | >= 2.2, < 3.0 |
+| <a name="requirement_azuread"></a> [azuread](#requirement\_azuread) | >= 3.0, < 4.0 |
+| <a name="requirement_azurerm"></a> [azurerm](#requirement\_azurerm) | >= 4.0, < 5.0 |
+
+## Resources
+
+| Name | Type |
+|------|------|
+| [azuread_group.main](https://registry.terraform.io/providers/hashicorp/azuread/latest/docs/resources/group) | resource |
+| [azuread_group_member.main](https://registry.terraform.io/providers/hashicorp/azuread/latest/docs/resources/group_member) | resource |
+| [azurerm_role_assignment.main](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/role_assignment) | resource |
+| [azurerm_subscription.main](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/subscription) | resource |
+| [azapi_client_config.current](https://registry.terraform.io/providers/azure/azapi/latest/docs/data-sources/client_config) | data source |
+| [azuread_group.main](https://registry.terraform.io/providers/hashicorp/azuread/latest/docs/data-sources/group) | data source |
+| [azurerm_billing_enrollment_account_scope.main](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/data-sources/billing_enrollment_account_scope) | data source |
+| [azurerm_client_config.current](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/data-sources/client_config) | data source |
+
+## Modules
+
+| Name | Source | Version |
+|------|--------|---------|
+| <a name="module_alz_architecture"></a> [alz\_architecture](#module\_alz\_architecture) | Azure/avm-ptn-alz/azurerm | 0.12.0 |
+
+## Inputs
+
+| Name | Description | Type | Default | Required |
+|------|-------------|------|---------|:--------:|
+| <a name="input_environment"></a> [environment](#input\_environment) | Name of Azure environment. | `string` | n/a | yes |
+| <a name="input_location"></a> [location](#input\_location) | Resource location for Azure resources. | `string` | n/a | yes |
+| <a name="input_project"></a> [project](#input\_project) | Project short name. | `string` | n/a | yes |
+| <a name="input_rbac_groups"></a> [rbac\_groups](#input\_rbac\_groups) | Groups RBAC Configuration. | <pre>list(object({<br/>    name                = string<br/>    group_members_names = optional(list(string))<br/>    role_definitions    = optional(list(string))<br/>  }))</pre> | n/a | yes |
+| <a name="input_tags"></a> [tags](#input\_tags) | Environment tags. | `map(string)` | n/a | yes |
+| <a name="input_deploy_caf_policies"></a> [deploy\_caf\_policies](#input\_deploy\_caf\_policies) | Deploy CAF policies in addition to the management group hierarchy. When false, only the hierarchy is deployed. | `bool` | `false` | no |
+| <a name="input_enable_telemetry"></a> [enable\_telemetry](#input\_enable\_telemetry) | Enable telemetry for the module. | `bool` | `true` | no |
+| <a name="input_management_group_subscriptions"></a> [management\_group\_subscriptions](#input\_management\_group\_subscriptions) | Subscriptions to place into management groups (one MG can have many subscriptions). | <pre>list(object({<br/>    id               = string<br/>    subscription_ids = list(string)<br/>  }))</pre> | `[]` | no |
+| <a name="input_subscriptions"></a> [subscriptions](#input\_subscriptions) | Azure Subscriptions to create. | <pre>object({<br/>    billing_account_name    = string<br/>    enrollment_account_name = string<br/>    subscriptions = list(object({<br/>      name                       = string<br/>      alias                      = optional(string)<br/>      parent_management_group_id = string<br/>    }))<br/>  })</pre> | `null` | no |
+
+## Outputs
+
+No outputs.
+<!-- END_TF_DOCS -->
+<!-- textlint-enable -->
+<!-- prettier-ignore-end -->
